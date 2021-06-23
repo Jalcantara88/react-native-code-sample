@@ -1,27 +1,20 @@
 import React, { Component, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, Modal, Button, TouchableOpacity } from 'react-native';
 import {Linking} from 'react-native';
+import Spinner from '../assets/spinner.svg';
 
-const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisible }) => {
-    //const[modalVisible, setModalVisible] = useState(false);
-    
+
+const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisible, setImage }) => {
     return(
         <>
             {/*basic card view*/}
             <View style={styles.resultHolder} >
-                {/*modal view for larger image view*/}
-                <Modal
-                    animationType='slide'
-                    transparent='true'
-                    visible={modalVisible}
-                    onRequestClose={() => toggleModal()}
-                >
-                    <View>
-                        <Image source={{uri: image_url}}/>
-                    </View>
-                </Modal>
+                
                 <TouchableOpacity
-                    onPress={() => toggleModal()}
+                    onPress={() => {
+                        setImage(image_url);
+                        toggleModal();
+                    }}
                 >
                     <Image source={{uri: image_url}} style={styles.image}/>
                 </TouchableOpacity>
@@ -44,7 +37,7 @@ const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisib
                             {year}
                         </Text>
                     </View>
-
+                    {/*open link to comicVine website showcasing this issue*/}
                     <Text style={styles.linkButton} onPress={() => Linking.openURL(link)}>
                         MORE DETAILS
                     </Text>
@@ -54,12 +47,13 @@ const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisib
     )
 }
 
-const CustomListView = ({itemList, filteredList, toggleModal, modalVisible}) => (
+const CustomListView = ({itemList, filteredList, toggleModal, modalVisible, setImage}) => (
     <View style={styles.issuesHolder}>
         <FlatList
             keyExtractor={item => item.id.toString()}
             data={itemList}
             extraData={filteredList}
+            initialNumToRender={5}
             renderItem={({item}) => 
                 <CustomView
                     name={item.volume.name}
@@ -69,6 +63,7 @@ const CustomListView = ({itemList, filteredList, toggleModal, modalVisible}) => 
                     year={item.cover_date ? item.cover_date : "N/A"}
                     toggleModal={toggleModal}
                     modalVisible={modalVisible}
+                    setImage={setImage}
                 />}
         />
     </View>
@@ -86,19 +81,44 @@ class Main extends Component {
             allIssues : [],
             //holds filtered list of issues based on inputs
             filteredList: [],
+
+            selectedImage: null,
             
             totalResults: 0,
             //holds loading value to show loading animation
             isLoading: true,
 
             modalVisible: false,
+
+            apiOffset: 0
         }
 
         
         
         
+        
+    }
+
+    toggleModal = () => {
+        this.setState({modalVisible: !this.state.modalVisible});
+        console.log(this.state.modalVisible);
+    }
+
+    setImage = image => {
+        this.setState({selectedImage: image});
+        console.log(this.state.selectedImage);
+    }
+
+    updateOffset = number => {
+        const newNum = this.state.apiOffset + number;
+        console.log("new num is " + newNum);
+        this.setState({apiOffset: newNum});
+        console.log("api offset is " + this.state.apiOffset);
+    }
+
+    apiCall(offset) {
         //fetch call to api from comic vine website using proxy to get around cors - with api key
-        fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/issues?api_key=65c3e7b3c65af20fbfe03bb5d0cd0b8e83e9fb1a&format=json')
+        fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/issues?api_key=65c3e7b3c65af20fbfe03bb5d0cd0b8e83e9fb1a&format=json&offset=' + offset)
         //turn response into json
         .then(response => 
             response.json()
@@ -120,34 +140,73 @@ class Main extends Component {
         });
     }
 
-    toggleModal = () => {
-        this.setState({modalVisible: !this.state.modalVisible});
-        console.log(this.state.modalVisible);
+    componentDidMount() {
+        this.apiCall(0);
     }
+
     
 
     //render method
     render() {
         
+        
         //check if api is done loading
         if(this.state.isLoading) {
             return(
-                <>
-                    the api call is isLoading
-                </>
+                <View>
+                    <img src={Spinner}/>
+                </View>
             )
         }
 
         else {
-            return (<>
-                <Text style={styles.detail}>TOTAL RESULTS: {this.state.totalResults}</Text>
-                <CustomListView 
-                    itemList={this.state.allIssues}
-                    filteredList={this.state.filteredList}
-                    modalVisible={this.state.modalVisible}
-                    toggleModal={this.toggleModal}   
-                />
-            </>);
+            return (
+                <View>
+                    {/*
+                    <Modal
+                        animationType='slide'
+                        transparent='true'
+                        visible={true}
+                        onRequestClose={() => this.toggleModal()}    
+                    >
+                        <View style={styles.modalView}>
+                            <Image style={styles.modalImage} source={{uri: this.state.selectedImage}}/>
+                        </View>
+                    </Modal>
+                    */}
+                    <Button
+                        onPress={() => {
+                            var newNum = this.state.apiOffset - 100;
+                            this.setState({apiOffset: newNum}, () => {
+                                this.setState({isLoading: true});
+                                this.apiCall(this.state.apiOffset);
+                            });
+                        }}
+                        disabled={this.state.apiOffset === 0 ? true : false}
+                        title="prev"
+                    />
+                    <Button
+                        onPress={() => {
+                            var newNum = this.state.apiOffset + 100;
+                            
+                            this.setState({apiOffset: newNum}, () => {
+                                this.setState({isLoading: true});
+                                this.apiCall(this.state.apiOffset);
+                            });
+                        }}
+                        title="next"
+                    />
+                    <Text style={styles.detail}>TOTAL RESULTS: {this.state.totalResults}</Text>
+                    <Text style={styles.detail}>Viewing: {this.state.apiOffset} - {this.state.apiOffset + 100}</Text>
+
+                    <CustomListView 
+                        itemList={this.state.allIssues}
+                        filteredList={this.state.filteredList}
+                        modalVisible={this.state.modalVisible}
+                        toggleModal={this.toggleModal} 
+                        setImage={this.setImage}  
+                    />
+                </View>);
         }
     }
 }
@@ -210,6 +269,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'lightpink',
         borderRadius: 5,
         marginBottom: 5,
+    },
+    modalView: {
+        margin: 20,
+        borderRadius: 10,
+        padding: 30,
+    },
+    modalImage: {
+        width: 400,
+        height: 600,
+        resizeMode: 'cover'
     }
   });
   
