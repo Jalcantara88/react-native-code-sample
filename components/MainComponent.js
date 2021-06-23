@@ -1,22 +1,60 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, StatusBar } from 'react-native';
+import React, { Component, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
+import {Linking} from 'react-native';
 
-const CustomView = ({name, image_url, issue, link}) => (
-    <View style={styles.resultHolder} >
-        <img src={image_url} style={{width: '200px'}}/>
-        <View style={styles.containerText}>
-            <Text style={styles.name}>
-                {name}
-            </Text>
-            <Text style={styles.issue}>
-                {issue}
-            </Text>
-            <a href={link}>link</a>
-        </View>
-    </View>
-)
+const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisible }) => {
+    //const[modalVisible, setModalVisible] = useState(false);
+    
+    return(
+        <>
+            {/*basic card view*/}
+            <View style={styles.resultHolder} >
+                {/*modal view for larger image view*/}
+                <Modal
+                    animationType='slide'
+                    transparent='true'
+                    visible={modalVisible}
+                    onRequestClose={() => toggleModal()}
+                >
+                    <View>
+                        <Image source={{uri: image_url}}/>
+                    </View>
+                </Modal>
+                <TouchableOpacity
+                    onPress={() => toggleModal()}
+                >
+                    <Image source={{uri: image_url}} style={styles.image}/>
+                </TouchableOpacity>
+                <View style={styles.containerText}>
+                    <View style={styles.labelGroup}>
+                        <Text style={styles.label}>name: </Text>
+                        <Text style={styles.detail}>
+                            {name}
+                        </Text>
+                    </View>
+                    <View style={styles.labelGroup}>
+                        <Text style={styles.label}>issue #: </Text>
+                        <Text style={styles.detail}>
+                            {issue}
+                        </Text>
+                    </View>
+                    <View style={styles.labelGroup}>
+                        <Text style={styles.label}>year: </Text>
+                        <Text style={styles.detail}>
+                            {year}
+                        </Text>
+                    </View>
 
-const CustomListView = ({itemList, filteredList}) => (
+                    <Text style={styles.linkButton} onPress={() => Linking.openURL(link)}>
+                        MORE DETAILS
+                    </Text>
+                </View>
+            </View>
+        </>
+    )
+}
+
+const CustomListView = ({itemList, filteredList, toggleModal, modalVisible}) => (
     <View style={styles.issuesHolder}>
         <FlatList
             keyExtractor={item => item.id.toString()}
@@ -28,6 +66,9 @@ const CustomListView = ({itemList, filteredList}) => (
                     image_url={item.image.original_url}
                     issue={item.issue_number}
                     link={item.site_detail_url}
+                    year={item.cover_date ? item.cover_date : "N/A"}
+                    toggleModal={toggleModal}
+                    modalVisible={modalVisible}
                 />}
         />
     </View>
@@ -46,68 +87,45 @@ class Main extends Component {
             //holds filtered list of issues based on inputs
             filteredList: [],
             
-            allImages: {},
+            totalResults: 0,
             //holds loading value to show loading animation
-            isLoading: true
+            isLoading: true,
+
+            modalVisible: false,
         }
+
+        
+        
         
         //fetch call to api from comic vine website using proxy to get around cors - with api key
         fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/issues?api_key=65c3e7b3c65af20fbfe03bb5d0cd0b8e83e9fb1a&format=json')
-        //grab text from api response
+        //turn response into json
         .then(response => 
-            //console.log(response.json());
             response.json()
         )
-        //parse data
-        //.then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
         .then(data => {
-            //grab node list of useable data
-            //const issueNodeList = data.querySelectorAll("issue");
+            //for looking at object structure
             console.log(data);
-            //convert nodelist to an array
+            this.setState({totalResults: data.number_of_total_results});
+            //store results in array
             const newArray = data.results;
-            //const newArray = Array.from(issueNodeList);
-            //console.log(newArray[0].querySelector("image").querySelector("thumb_url").childNodes[0].data);
             //update state with array
             this.setState({allIssues: newArray});
-
-            const allRenderedImages = this.state.allIssues.map((item, i) => {
-                const name = item.volume.name;
-                const imageSrc = item.image.thumb_url;
-                const issueNum = item.issue_number;
-                const linkUrl = item.site_detail_url;
-                const details = item.description;
-                //const imageSrc = item.querySelector("image").querySelector("thumb_url").childNodes[0].data;
-                //const linkUrl = item.querySelector("api_detail_url").childNodes[0] ? item.querySelector("api_detail_url").childNodes[0].data : "";
-                
-                //console.log(item.querySelector("description").childNodes[0].data);
-                //const name = item.querySelector("name").childNodes[0] ? item.querySelector("name").childNodes[0].data : "";
-                //console.log(imageSrc);
-                return(
-                    <div key={i}>
-                        <img src={imageSrc}/>
-                        <Text>{name}</Text>
-                        
-                        <a href={linkUrl}>more details</a>
-                    </div>
-                );
-            });
-            
-            this.setState({allImages: allRenderedImages});
-
+            //once info is stored we can change isloading to false to render data
             this.setState({isLoading: false});
-
-            //console.log(this.state.allIssues);
         })
         //catch any errors
         .catch((error) => {
             console.error(error);
         });
-         
-        
+    }
+
+    toggleModal = () => {
+        this.setState({modalVisible: !this.state.modalVisible});
+        console.log(this.state.modalVisible);
     }
     
-    
+
     //render method
     render() {
         
@@ -122,9 +140,12 @@ class Main extends Component {
 
         else {
             return (<>
+                <Text style={styles.detail}>TOTAL RESULTS: {this.state.totalResults}</Text>
                 <CustomListView 
                     itemList={this.state.allIssues}
-                    filteredList={this.state.filteredList}    
+                    filteredList={this.state.filteredList}
+                    modalVisible={this.state.modalVisible}
+                    toggleModal={this.toggleModal}   
                 />
             </>);
         }
@@ -135,26 +156,25 @@ const styles = StyleSheet.create({
     resultHolder: {
         flex: 1,
         flexDirection: 'row',
-        padding: 10,
+        padding: 15,
         shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,  
-    elevation: 5,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5,
         backgroundColor: '#fff',
         margin: 5,
         justifyContent: 'center',
-        alignItems: 'center',
-
         borderRadius: 10
     },
     issuesHolder: {
         flex: 1
     },
-    name: {
-        fontSize: 26,
+    detail: {
+        fontSize: 25,
         fontWeight: 500,
-        color: '#000'
+        padding: 5,
+        textAlign: 'center'
     },
     containerText: {
         flex: 1,
@@ -162,8 +182,35 @@ const styles = StyleSheet.create({
         marginLeft: 22,
         justifyContent: 'center'
     },
-   
+    linkButton: {
+        textDecorationLine: 'none',
+        backgroundColor: 'dodgerblue',
+        paddingVertical: 5,
+        textAlign: 'center',
+        fontSize: 20,
+        fontWeight: 400,
+        borderRadius: 5,
+        color: 'white'
+    },
+    image: {
+        width: '200px',
+        height: '300px',
+        resizeMode: 'cover',
+        
+    },
+    label: {
+        backgroundColor: 'crimson',
+        color: 'white',
+        padding: 3,
+        paddingLeft: 5,
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+    },
+    labelGroup: {
+        backgroundColor: 'lightpink',
+        borderRadius: 5,
+        marginBottom: 5,
+    }
   });
   
-
 export default Main;
