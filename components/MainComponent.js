@@ -3,13 +3,12 @@ import { StyleSheet, Text, View, FlatList, Image, Modal, Button, TouchableOpacit
 import {Linking} from 'react-native';
 import Spinner from '../assets/spinner.svg';
 
-
 const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisible, setImage }) => {
     return(
         <>
             {/*basic card view*/}
             <View style={styles.resultHolder} >
-                
+                {/*Clickable Image*/}
                 <TouchableOpacity
                     onPress={() => {
                         setImage(image_url);
@@ -18,19 +17,23 @@ const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisib
                 >
                     <Image source={{uri: image_url}} style={styles.image}/>
                 </TouchableOpacity>
+                {/*Info Display*/}
                 <View style={styles.containerText}>
+                    {/*Name*/}
                     <View style={styles.labelGroup}>
                         <Text style={styles.label}>name: </Text>
                         <Text style={styles.detail}>
                             {name}
                         </Text>
                     </View>
+                    {/*Issue Number*/}
                     <View style={styles.labelGroup}>
                         <Text style={styles.label}>issue #: </Text>
                         <Text style={styles.detail}>
                             {issue}
                         </Text>
                     </View>
+                    {/*Year Released*/}
                     <View style={styles.labelGroup}>
                         <Text style={styles.label}>year: </Text>
                         <Text style={styles.detail}>
@@ -47,6 +50,7 @@ const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisib
     )
 }
 
+{/*Custom list view that uses flatlist to iterate over array holding api response*/}
 const CustomListView = ({itemList, filteredList, toggleModal, modalVisible, setImage}) => (
     <View style={styles.issuesHolder}>
         <FlatList
@@ -54,7 +58,8 @@ const CustomListView = ({itemList, filteredList, toggleModal, modalVisible, setI
             data={itemList}
             extraData={filteredList}
             initialNumToRender={5}
-            renderItem={({item}) => 
+            renderItem={({item}) => {
+                {/*Call custom view component passing in values from array item*/}
                 <CustomView
                     name={item.volume.name}
                     image_url={item.image.original_url}
@@ -64,14 +69,14 @@ const CustomListView = ({itemList, filteredList, toggleModal, modalVisible, setI
                     toggleModal={toggleModal}
                     modalVisible={modalVisible}
                     setImage={setImage}
-                />}
+                />
+            }}
         />
     </View>
 )
 
 //create class to hold state and render list
 class Main extends Component {
-
     //create constructor to hold props
     constructor(props) {
         //grab props from parent
@@ -81,22 +86,17 @@ class Main extends Component {
             allIssues : [],
             //holds filtered list of issues based on inputs
             filteredList: [],
-
+            //holds url of last image clicked
             selectedImage: null,
-            
+            //holds number of results from api call
             totalResults: 0,
             //holds loading value to show loading animation
             isLoading: true,
-
+            //holds bool that controls modal
             modalVisible: false,
-
+            //holds offset for api call
             apiOffset: 0
         }
-
-        
-        
-        
-        
     }
 
     toggleModal = () => {
@@ -107,13 +107,6 @@ class Main extends Component {
     setImage = image => {
         this.setState({selectedImage: image});
         console.log(this.state.selectedImage);
-    }
-
-    updateOffset = number => {
-        const newNum = this.state.apiOffset + number;
-        console.log("new num is " + newNum);
-        this.setState({apiOffset: newNum});
-        console.log("api offset is " + this.state.apiOffset);
     }
 
     apiCall(offset) {
@@ -144,12 +137,9 @@ class Main extends Component {
         this.apiCall(0);
     }
 
-    
-
     //render method
     render() {
-        
-        
+          
         //check if api is done loading
         if(this.state.isLoading) {
             return(
@@ -176,6 +166,7 @@ class Main extends Component {
                     */}
                     <Button
                         onPress={() => {
+                            //set new ofset value then pass that into api call function on second param
                             var newNum = this.state.apiOffset - 100;
                             this.setState({apiOffset: newNum}, () => {
                                 this.setState({isLoading: true});
@@ -187,6 +178,7 @@ class Main extends Component {
                     />
                     <Button
                         onPress={() => {
+                            //set new ofset value then pass that into api call function on second param
                             var newNum = this.state.apiOffset + 100;
                             
                             this.setState({apiOffset: newNum}, () => {
@@ -198,7 +190,7 @@ class Main extends Component {
                     />
                     <Text style={styles.detail}>TOTAL RESULTS: {this.state.totalResults}</Text>
                     <Text style={styles.detail}>Viewing: {this.state.apiOffset} - {this.state.apiOffset + 100}</Text>
-
+                    {/*Render api results*/}
                     <CustomListView 
                         itemList={this.state.allIssues}
                         filteredList={this.state.filteredList}
@@ -210,7 +202,7 @@ class Main extends Component {
         }
     }
 }
-
+//Stylesheet for page
 const styles = StyleSheet.create({
     resultHolder: {
         flex: 1,
