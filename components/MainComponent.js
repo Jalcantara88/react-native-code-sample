@@ -1,22 +1,21 @@
-import React, { Component, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, Modal, Button, TouchableOpacity } from 'react-native';
+import React, { Component } from 'react';
+import { 
+    StyleSheet, 
+    Text, 
+    View, 
+    FlatList, 
+    Image, 
+    Button, 
+} from 'react-native';
 import {Linking} from 'react-native';
 import Spinner from '../assets/spinner.svg';
 
-const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisible, setImage }) => {
+const CustomView = ({name, image_url, issue, link, year}) => {
     return(
         <>
             {/*basic card view*/}
             <View style={styles.resultHolder} >
-                {/*Clickable Image*/}
-                <TouchableOpacity
-                    onPress={() => {
-                        setImage(image_url);
-                        toggleModal();
-                    }}
-                >
-                    <Image source={{uri: image_url}} style={styles.image}/>
-                </TouchableOpacity>
+                <Image source={{uri: image_url}} style={styles.image}/>
                 {/*Info Display*/}
                 <View style={styles.containerText}>
                     {/*Name*/}
@@ -51,15 +50,16 @@ const CustomView = ({name, image_url, issue, link, year, toggleModal, modalVisib
 }
 
 {/*Custom list view that uses flatlist to iterate over array holding api response*/}
-const CustomListView = ({itemList, filteredList, toggleModal, modalVisible, setImage}) => (
+const CustomListView = ({itemList, toggleModal, modalVisible, setImage}) => {
+    return(
     <View style={styles.issuesHolder}>
         <FlatList
             keyExtractor={item => item.id.toString()}
             data={itemList}
-            extraData={filteredList}
+            
             initialNumToRender={5}
             renderItem={({item}) => {
-                {/*Call custom view component passing in values from array item*/}
+                return(
                 <CustomView
                     name={item.volume.name}
                     image_url={item.image.original_url}
@@ -70,10 +70,11 @@ const CustomListView = ({itemList, filteredList, toggleModal, modalVisible, setI
                     modalVisible={modalVisible}
                     setImage={setImage}
                 />
+                )
             }}
         />
     </View>
-)
+    )}
 
 //create class to hold state and render list
 class Main extends Component {
@@ -84,16 +85,10 @@ class Main extends Component {
         this.state = {
             //holds all issues returned from api call
             allIssues : [],
-            //holds filtered list of issues based on inputs
-            filteredList: [],
-            //holds url of last image clicked
-            selectedImage: null,
             //holds number of results from api call
             totalResults: 0,
             //holds loading value to show loading animation
             isLoading: true,
-            //holds bool that controls modal
-            modalVisible: false,
             //holds offset for api call
             apiOffset: 0
         }
@@ -102,11 +97,6 @@ class Main extends Component {
     toggleModal = () => {
         this.setState({modalVisible: !this.state.modalVisible});
         console.log(this.state.modalVisible);
-    }
-
-    setImage = image => {
-        this.setState({selectedImage: image});
-        console.log(this.state.selectedImage);
     }
 
     apiCall(offset) {
@@ -138,9 +128,9 @@ class Main extends Component {
     }
 
     //render method
-    render() {
-          
+    render() { 
         //check if api is done loading
+        console.log(this.state.modalVisible);
         if(this.state.isLoading) {
             return(
                 <View>
@@ -148,22 +138,11 @@ class Main extends Component {
                 </View>
             )
         }
-
+         
         else {
             return (
+                <>
                 <View>
-                    {/*
-                    <Modal
-                        animationType='slide'
-                        transparent='true'
-                        visible={true}
-                        onRequestClose={() => this.toggleModal()}    
-                    >
-                        <View style={styles.modalView}>
-                            <Image style={styles.modalImage} source={{uri: this.state.selectedImage}}/>
-                        </View>
-                    </Modal>
-                    */}
                     <Button
                         onPress={() => {
                             //set new ofset value then pass that into api call function on second param
@@ -191,14 +170,14 @@ class Main extends Component {
                     <Text style={styles.detail}>TOTAL RESULTS: {this.state.totalResults}</Text>
                     <Text style={styles.detail}>Viewing: {this.state.apiOffset} - {this.state.apiOffset + 100}</Text>
                     {/*Render api results*/}
+                    {console.log("about to render list")}
                     <CustomListView 
                         itemList={this.state.allIssues}
-                        filteredList={this.state.filteredList}
                         modalVisible={this.state.modalVisible}
                         toggleModal={this.toggleModal} 
                         setImage={this.setImage}  
                     />
-                </View>);
+                </View></>);  
         }
     }
 }
@@ -262,16 +241,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 5,
     },
-    modalView: {
-        margin: 20,
-        borderRadius: 10,
-        padding: 30,
-    },
-    modalImage: {
-        width: 400,
-        height: 600,
-        resizeMode: 'cover'
-    }
   });
   
 export default Main;
