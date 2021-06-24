@@ -17,7 +17,7 @@ This is to render this spinning loading icon
 <br/>
 ![animated loading icon](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/spinner.PNG)
 
-1. `Animated` value held in variable `spinValue
+1. `Animated` value held in variable `spinValue`
 `var spinValue = new Animated.Value(0);`
 
 2. Set up animation `loop` with `timing` function. 
