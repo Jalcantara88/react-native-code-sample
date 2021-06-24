@@ -12,6 +12,7 @@
 from: [MainComponent.js](components/MainComponent.js)
 
 This is to render this animated loading icon
+<br/>
 ![animated loading icon](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/spinner.PNG)
 
 1. Load image and save path to variable
@@ -33,6 +34,7 @@ if(this.state.isLoading) {
 
 
 ### Making an API call
+from: [MainComponent.js](components/MainComponent.js)
 
 This is to make an API call to [Comic Vine API](https://comicvine.gamespot.com/api/) and store an array from within the response. 
 
@@ -66,9 +68,11 @@ apiCall() {
 ```
 
 3. This returns an array taken from the `results` sub object `json` object received as response. This is now stored in `this.state.allIssues`
-![json response object](tree/main/assets/readme/apiResponse.png)
+<br/>
+![json response object](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/apiResponse.PNG)
 
 ### Pagination of API request with Buttons
+from: [MainComponent.js](components/MainComponent.js)
 
 This is to iterate through a paginated `json` response.
 Comic Vine limits the `response` to only hold 100 items in the `results` array. But by passing in an `offset` value on the `api` call.
@@ -85,7 +89,8 @@ fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/i
 `
 
 4. There are 2 buttons that alter the `offset` value using `setState`.
-![offset buttons](/assets/readme/buttons.png)
+<br/>
+![offset buttons](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/buttons.PNG)
 
 `onPress` sets the `state`'s offset to  add or subtract 100 depending on button pressed. Then it fires a new `api` call passing in the new offset. I used `useState`'s second parameter to make sure things happened sequentially because of the asynchronous calls.
 ```
@@ -122,7 +127,8 @@ It also sets the `isLoading` value to true to show the loading animation while w
 from: [CustomView.js](components/CustomView.js)
 
 This uses `FlatList` with a custom render method to display the comic book results.
-![rendered item](/assets/readme/customRender.png)
+<br/>
+![rendered item](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/customRender.PNG)
 
 1. Created custom render method. This takes in paramaters to grab in `name`, `image_url`, `issue`, and `link` to display them as you see in the picture.
 ```
@@ -201,7 +207,8 @@ This is where `CustomView` component is fed in the info from `itemList`.
 ```
 
 4. This is the structure of each object in allIssues.
-![array structure](/assets/readme/arrayStructure.png) 
+<br/>
+![array structure](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/arrayStructure.PNG) 
 
 ## Setting Up Locally
 
