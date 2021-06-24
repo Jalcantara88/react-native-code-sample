@@ -68,7 +68,6 @@ apiCall() {
 ```
 
 3. This returns an array taken from the `results` sub object `json` object received as response. This is now stored in `this.state.allIssues`
-<br/>
 ![json response object](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/apiResponse.PNG)
 
 ### Pagination of API request with Buttons
@@ -89,7 +88,6 @@ fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/i
 `
 
 4. There are 2 buttons that alter the `offset` value using `setState`.
-<br/>
 ![offset buttons](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/buttons.PNG)
 
 `onPress` sets the `state`'s offset to  add or subtract 100 depending on button pressed. Then it fires a new `api` call passing in the new offset. I used `useState`'s second parameter to make sure things happened sequentially because of the asynchronous calls.
@@ -207,7 +205,7 @@ This is where `CustomView` component is fed in the info from `itemList`.
 ```
 
 4. This is the structure of each object in allIssues.
-<br/>
+
 ![array structure](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/arrayStructure.PNG) 
 
 ## Setting Up Locally
