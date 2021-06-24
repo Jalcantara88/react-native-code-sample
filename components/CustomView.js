@@ -2,6 +2,7 @@ import React from 'react';
 import {Linking} from 'react-native';
 import {FlatList, Image, View, Text, StyleSheet} from 'react-native';
 
+{/*Custom display for FlatList renderItem*/}
 const CustomView = ({name, image_url, issue, link, year}) => {
     return(
         <>
@@ -42,31 +43,28 @@ const CustomView = ({name, image_url, issue, link, year}) => {
 }
 
 {/*Custom list view that uses flatlist to iterate over array holding api response*/}
-const CustomListView = ({itemList, toggleModal, modalVisible, setImage}) => {
+const CustomListView = ({itemList}) => {
     return(
     <View style={styles.issuesHolder}>
+        {/*Use flatlist to call CustomView on every item of itemList*/}
         <FlatList
             keyExtractor={item => item.id.toString()}
             data={itemList}
-            
-            initialNumToRender={5}
             renderItem={({item}) => {
                 return(
+                    //call custom render method
                 <CustomView
                     name={item.volume.name}
                     image_url={item.image.original_url}
                     issue={item.issue_number}
                     link={item.site_detail_url}
                     year={item.cover_date ? item.cover_date : "N/A"}
-                    toggleModal={toggleModal}
-                    modalVisible={modalVisible}
-                    setImage={setImage}
                 />
                 )
             }}
         />
     </View>
-    )}
+)}
 const styles = StyleSheet.create({
     resultHolder: {
         flex: 1,

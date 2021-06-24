@@ -59,7 +59,6 @@ class Main extends Component {
     //render method
     render() { 
         //check if api is done loading
-        console.log(this.state.modalVisible);
         if(this.state.isLoading) {
             return(
                 <View>
@@ -98,12 +97,8 @@ class Main extends Component {
                     <Text style={styles.detail}>TOTAL RESULTS: {this.state.totalResults}</Text>
                     <Text style={styles.detail}>Viewing: {this.state.apiOffset} - {this.state.apiOffset + 100}</Text>
                     {/*Render api results*/}
-                    {console.log("about to render list")}
                     <CustomListView 
-                        itemList={this.state.allIssues}
-                        modalVisible={this.state.modalVisible}
-                        toggleModal={this.toggleModal} 
-                        setImage={this.setImage}  
+                        itemList={this.state.allIssues}  
                     />
                 </View></>);  
         }
