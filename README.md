@@ -2,36 +2,67 @@
 ![app preview](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/appPreview.PNG)
 
 #### This code sample uses React Native to showcase:
-####     - `Import`-ing and using an `SVG`
+####     - `Animate`-ing an `Image` using an `PNG`
 ####     - Making an `API` call
 ####     - Paginating `API` request with `Button`s
 ####     - Using `Flatlist` with custom `View`
 
 
-### Importing and using an SVG
+### Animating an Image using an PNG
 from: [MainComponent.js](components/MainComponent.js)
 
-This is to render this animated loading icon
+This is to render this spinning loading icon
 <br/>
 ![animated loading icon](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/spinner.PNG)
 
-1. Load image and save path to variable
-`import Spinner from '../assets/spinner.svg';`
+1. `Animated` value held in variable `spinValue
+`var spinValue = new Animated.Value(0);`
 
-2. Create `img` element with path
-`<img src={Spinner}/>`
+2. Set up animation `loop` with `timing` function. 
+```
+// First set up animation 
+Animated.loop(
+    Animated.timing(
+        spinValue,
+    {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.linear, // Easing is an additional import from react-native
+        useNativeDriver: true  // To make use of native driver for performance
+    }
+    )).start()
+```
 
-3. This is an animated `SVG` so to show it conditionally only when "loading"
-`
+3. `spin` holds the interpolated values from `spinValue` for a 360 spin.
+```
+const spin = spinValue.interpolate({
+  inputRange: [0, 1],
+  outputRange: ['0deg', '360deg']
+});
+```
+
+4. Created `Animated.Image` element with path to spinner
+`<Animated.Image style={styles.spinner} source={require("../assets/Spinner.png")}/>`
+
+5. Passed in `spin` to the `transform` attribute of the `Image` element
+```
+spinner: {
+    width: "200px",
+    height: "200px",
+    transform: [{rotate: spin}]
+}
+```
+
+5. This animated spinner is shown conditionally only when "loading"
+```
 if(this.state.isLoading) {
     return(
         <View>
-            <img src={Spinner}/>
+            <Animated.Image style={styles.spinner} source={require("../assets/Spinner.png")}/>
         </View>
     )
 }
-`
-
+```
 
 ### Making an API call
 from: [MainComponent.js](components/MainComponent.js)
@@ -43,28 +74,28 @@ This is to make an API call to [Comic Vine API](https://comicvine.gamespot.com/a
 2. Make a `FUNCTION` that uses an asynchronous fetch call and stores
 ```
 apiCall() {
-        //fetch call to api from comic vine website using proxy to get around cors - with api key
-        fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/issues?api_key=<YOUR API KEY>=json')
-        //turn response into json
-        .then(response => 
-            response.json()
-        )
-        .then(data => {
-            //for looking at object structure
-            console.log(data);
-            this.setState({totalResults: data.number_of_total_results});
-            //store results in array
-            const newArray = data.results;
-            //update state with array
-            this.setState({allIssues: newArray});
-            //once info is stored we can change isloading to false to render data
-            this.setState({isLoading: false});
-        })
-        //catch any errors
-        .catch((error) => {
-            console.error(error);
-        });
-    }
+    //fetch call to api from comic vine website using proxy to get around cors - with api key
+    fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/issues?api_key=<YOUR API KEY>=json')
+    //turn response into json
+    .then(response => 
+        response.json()
+    )
+    .then(data => {
+        //for looking at object structure
+        console.log(data);
+        this.setState({totalResults: data.number_of_total_results});
+        //store results in array
+        const newArray = data.results;
+        //update state with array
+        this.setState({allIssues: newArray});
+        //once info is stored we can change isloading to false to render data
+        this.setState({isLoading: false});
+    })
+    //catch any errors
+    .catch((error) => {
+        console.error(error);
+    });
+}
 ```
 
 3. This returns an array taken from the `results` sub object `json` object received as response. This is now stored in `this.state.allIssues`
@@ -166,7 +197,8 @@ const CustomView = ({name, image_url, issue, link, year}) => {
                 </View>
             </View>
         </>
-    )
+    );
+}
 ```
  The link also uses `Linking.openUrl` as a hyperlink.
 

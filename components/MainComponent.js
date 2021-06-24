@@ -3,12 +3,32 @@ import {
     StyleSheet, 
     Text, 
     View,  
-    Button, 
+    Button,
+    Animated,
+    Easing
 } from 'react-native';
-//animated svg for when loading
-import Spinner from '../assets/spinner.svg';
 //custom render view for displaying api results
 import CustomListView from './CustomView';
+
+var spinValue = new Animated.Value(0);
+
+// First set up animation 
+Animated.loop(
+    Animated.timing(
+        spinValue,
+    {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.linear,
+        useNativeDriver: true  
+    }
+    )).start()
+
+//interpolate beginning and end values
+const spin = spinValue.interpolate({
+  inputRange: [0, 1],
+  outputRange: ['0deg', '360deg']
+});
 
 //create class to hold state and render list
 class Main extends Component {
@@ -62,7 +82,7 @@ class Main extends Component {
         if(this.state.isLoading) {
             return(
                 <View>
-                    <img src={Spinner}/>
+                    <Animated.Image style={styles.spinner} source={require("../assets/Spinner.png")}/>
                 </View>
             )
         }
@@ -100,17 +120,24 @@ class Main extends Component {
                     <CustomListView 
                         itemList={this.state.allIssues}  
                     />
-                </View></>);  
+                </View>
+                </>);  
         }
     }
 }
+
 //Stylesheet for page
 const styles = StyleSheet.create({
     detail: {
         fontSize: 25,
-        fontWeight: 500,
+        fontWeight: "500",
         padding: 5,
         textAlign: 'center'
+    },
+    spinner: {
+        width: "200px",
+        height: "200px",
+        transform: [{rotate: spin}]
     }
   });
   

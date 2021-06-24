@@ -45,26 +45,27 @@ const CustomView = ({name, image_url, issue, link, year}) => {
 {/*Custom list view that uses flatlist to iterate over array holding api response*/}
 const CustomListView = ({itemList}) => {
     return(
-    <View style={styles.issuesHolder}>
-        {/*Use flatlist to call CustomView on every item of itemList*/}
-        <FlatList
-            keyExtractor={item => item.id.toString()}
-            data={itemList}
-            renderItem={({item}) => {
-                return(
-                    //call custom render method
-                <CustomView
-                    name={item.volume.name}
-                    image_url={item.image.original_url}
-                    issue={item.issue_number}
-                    link={item.site_detail_url}
-                    year={item.cover_date ? item.cover_date : "N/A"}
-                />
-                )
-            }}
-        />
-    </View>
+        <View style={styles.issuesHolder}>
+            {/*Use flatlist to call CustomView on every item of itemList*/}
+            <FlatList
+                keyExtractor={item => item.id.toString()}
+                data={itemList}
+                renderItem={({item}) => {
+                    return(
+                        //call custom render method
+                    <CustomView
+                        name={item.volume.name}
+                        image_url={item.image.original_url}
+                        issue={item.issue_number}
+                        link={item.site_detail_url}
+                        year={item.cover_date ? item.cover_date : "N/A"}
+                    />
+                    )
+                }}
+            />
+        </View>
 )}
+
 const styles = StyleSheet.create({
     resultHolder: {
         flex: 1,
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     },
     detail: {
         fontSize: 25,
-        fontWeight: 500,
+        fontWeight: "500",
         padding: 5,
         textAlign: 'center'
     },
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         textAlign: 'center',
         fontSize: 20,
-        fontWeight: 400,
+        fontWeight: "400",
         borderRadius: 5,
         color: 'white'
     },
@@ -124,6 +125,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 5,
     },
-    });
+});
 
 export default CustomListView;
