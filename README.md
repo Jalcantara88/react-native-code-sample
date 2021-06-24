@@ -66,7 +66,7 @@ apiCall() {
 ```
 
 3. This returns an array taken from the `results` sub object `json` object received as response. This is now stored in `this.state.allIssues`
-![json response object](/assets/readme/apiResponse.png)
+![json response object](tree/main/assets/readme/apiResponse.png)
 
 ### Pagination of API request with Buttons
 
