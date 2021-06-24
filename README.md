@@ -1,6 +1,8 @@
 # React Native Code Sample
 ![app preview](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/appPreview.PNG)
 
+Depoyed Site [HERE](https://react-native-code-sample.netlify.app/)
+
 #### This code sample uses React Native to showcase:
 ####     - `Animate`-ing an `Image` using an `PNG`
 ####     - Making an `API` call
