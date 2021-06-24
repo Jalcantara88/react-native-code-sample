@@ -12,7 +12,7 @@
 from: [MainComponent.js](components/MainComponent.js)
 
 This is to render this animated loading icon
-![animated loading icon](assets/readme/spinner.png)
+![animated loading icon](/assets/readme/spinner.png)
 
 1. Load image and save path to variable
 `import Spinner from '../assets/spinner.svg';`
@@ -66,7 +66,7 @@ apiCall() {
 ```
 
 3. This returns an array taken from the `results` sub object `json` object received as response. This is now stored in `this.state.allIssues`
-![json response object](assets/readme/apiResponse.png)
+![json response object](/assets/readme/apiResponse.png)
 
 ### Pagination of API request with Buttons
 
@@ -85,7 +85,7 @@ fetch('https://proxy-cors-anywhere.herokuapp.com/https://www.comicvine.com/api/i
 `
 
 4. There are 2 buttons that alter the `offset` value using `setState`.
-![offet buttons](assets/readme/buttons.png)
+![offset buttons](/assets/readme/buttons.png)
 
 `onPress` sets the `state`'s offset to  add or subtract 100 depending on button pressed. Then it fires a new `api` call passing in the new offset. I used `useState`'s second parameter to make sure things happened sequentially because of the asynchronous calls.
 ```
@@ -122,7 +122,7 @@ It also sets the `isLoading` value to true to show the loading animation while w
 from: [CustomView.js](components/CustomView.js)
 
 This uses `FlatList` with a custom render method to display the comic book results.
-![rendered item](assets/readme/customRender.png)
+![rendered item](/assets/readme/customRender.png)
 
 1. Created custom render method. This takes in paramaters to grab in `name`, `image_url`, `issue`, and `link` to display them as you see in the picture.
 ```
@@ -201,7 +201,7 @@ This is where `CustomView` component is fed in the info from `itemList`.
 ```
 
 4. This is the structure of each object in allIssues.
-![array structure](assets/readme/arrayStructure.png) 
+![array structure](/assets/readme/arrayStructure.png) 
 
 ## Setting Up Locally
 
