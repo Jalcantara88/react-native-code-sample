@@ -1,5 +1,5 @@
 # React Native Code Sample
-![app preview](assets/readme/appPreview.png)
+![app preview](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/appPreview.PNG)
 
 #### This code sample uses React Native to showcase:
 ####     - `Import`-ing and using an `SVG`
@@ -12,7 +12,7 @@
 from: [MainComponent.js](components/MainComponent.js)
 
 This is to render this animated loading icon
-![animated loading icon](/assets/readme/spinner.png)
+![animated loading icon](https://github.com/Jalcantara88/react-native-code-sample/blob/main/assets/readme/spinner.PNG)
 
 1. Load image and save path to variable
 `import Spinner from '../assets/spinner.svg';`
